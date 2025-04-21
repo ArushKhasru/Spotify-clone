@@ -5,6 +5,9 @@
     margin: 0;
     padding: 0;
 }
+:root{
+    --a:0;
+}
 
 body {
     background-color: black;
@@ -125,6 +128,8 @@ body {
     border-radius: 5px;
     background-color: #252525;
     position: relative;
+    cursor: pointer;
+    transition: all .9s;
 
 
 }
@@ -140,18 +145,17 @@ body {
 
 .play {
     position: absolute;
-    top: 210px;
-    right: 25px;
-    opacity: 0;
+    top: 190px;
+    right: 19px;
+    opacity: var(--a);
     transition: all 0.3s ease-out;
 
 }
-
-.play:hover {
-    opacity: 1;
-    transform: scale(2);
-    bottom: 1px;
+.card:hover{
+    background-color: rgb(81, 81, 81);
+    --a:1;
 }
+
 
 .buttons {
     margin-right: 14px;
@@ -357,13 +361,46 @@ button {
     .seekbar {
         width: calc(100vw - 120px);
     }
-    .card{
-        width: 44vw;
-    }
-    .cardContainer{
-        margin: 0;
-        justify-content: center;
-    }
+   .cardContainer {
+    display: flex;
+    flex-direction: row; /* Changed from column to row */
+    gap: 20px; /* Space between cards */
+    justify-content: center; /* Center cards horizontally */
+    align-items: flex-start; /* Align cards at the top */
+     flex-wrap: wrap;/* Allow cards to wrap on smaller screens */
+}
+
+.card {
+    position: relative;
+    width: 200px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.play {
+    position: absolute;
+    top: 210px;
+    right: 25px;
+    flex-wrap: wrap;
+}
+
+.card img {
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.card h2 {
+    margin: 0 0 5px 0;
+    font-size: 1.2em;
+}
+
+.card p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+}
     .right {
         margin:0;
         width: 91vw;
