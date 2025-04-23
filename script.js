@@ -20,8 +20,7 @@ function secondsToMinutesSeconds(seconds) {
 async function getSongs(folder) {
     currFolder=folder;
     let a = await fetch(`http://127.0.0.1:3000/${folder}/`)
-    let response = await a.text();
-    console.log(response)
+    let response = await a.text(); 
     let div = document.createElement("div")
     div.innerHTML = response;
     let as = div.getElementsByTagName("a")
@@ -34,6 +33,7 @@ async function getSongs(folder) {
         }
     }
      let songUL = document.querySelector(".songList").getElementsByTagName("ul")[0]
+     songUL.innerHTML = ""
     for (const song of songs) {
         songUL.innerHTML += `<li><img class="invert" src="music.svg" alt="">
             <div class="info">
@@ -60,10 +60,50 @@ const playMusic = (track, pause = false)=>{
      
 Array.from(document.querySelector(".songList").getElementsByTagName("li")).forEach(e=>{
     e.addEventListener("click",element=>{
-        playMusic(e.querySelector(".info").firstElementChild.innerHTML.trim())
+        playMusic(e.querySelector(".info").firstElementChild.innerHTML.trim()+".mp3")
     })
 })
 
+}
+async function displayAlbums(){
+    let a = await fetch(`http://127.0.0.1:3000/songs/`)
+    let response = await a.text(); 
+    let div = document.createElement("div")
+    div.innerHTML = response;
+    let anchors = div.getElementsByTagName("a")
+    let cardContainer = document.querySelector(".cardContainer")
+   let array =  Array.from(anchors)
+   for (let index = 0; index < array.length; index++) {
+    const e = array[index];
+        if(e.href.includes("/songs/")){
+           let folder = e.href.split("/").slice(-2)[0]
+           console.log(folder)
+           //Get metadata of the folder
+              let a = await fetch(`/songs/${folder}/info.json/`)
+           let response = await a.json();
+           console.log(response)
+           cardContainer.innerHTML = cardContainer.innerHTML + `<div data-folder="${folder}" class="card">
+        <div class="play">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40">
+                <circle cx="12" cy="12" r="12" fill="green" />
+                <path d="M9.5 11.1998V12.8002C9.5 14.3195 9.5 15.0791 9.95576 15.3862C10.4115 15.6932 11.0348 15.3535 12.2815 14.6741L13.7497 13.8738C15.2499 13.0562 16 12.6474 16 12C16 11.3526 15.2499 10.9438 13.7497 10.1262L12.2815 9.32594C11.0348 8.6465 10.4115 8.30678 9.95576 8.61382C9.5 8.92086 9.5 9.6805 9.5 11.1998Z" fill="black" />
+            </svg>
+        </div>
+        <img src="/songs/${folder}/cover.jpg" alt="Happy Hits cover image">
+        <h2>${response.title}</h2>
+        <p>${response.description}</p>
+    </div>`
+        }
+    }
+    // display albums when the card is clicked
+       Array.from(document.getElementsByClassName("card")).forEach(e => { 
+        e.addEventListener("click", async item => {
+            console.log("Fetching Songs")
+            songs = await getSongs(`songs/${item.currentTarget.dataset.folder}`)  
+            playMusic(songs[0])
+
+        })
+    })
 }
 
 async function main() {
@@ -71,6 +111,7 @@ async function main() {
 
     await getSongs("songs/English")
     playMusic(songs[0], true)
+    await displayAlbums()
 
     //Show all the songs in the playlists
   
@@ -115,7 +156,7 @@ async function main() {
     next.addEventListener("click", ()=> {
         // currentSong.pause()
         let index = songs.indexOf(currentSong.src.split("/").slice(-1)[0])
-        if((index+1)<songs.length-1){
+        if((index+1)<songs.length){
             playMusic(songs[index+1])
         }
     })
@@ -124,15 +165,7 @@ async function main() {
     console.log(e.target.value,"/100")
     currentSong.volume = parseInt(e.target.value)/100
   })
-  
-  //load the playlilst whenever the card is clicked
-    Array.from(document.getElementsByClassName("card")).forEach(e=>{
-        e.addEventListener("click", async item=>{
-            console.log(e)
-            songs = await getSongs(`/songs/${item.currentTarget.dataset.currFolder}`)
 
-        })
-    })
 }
 
 main()
